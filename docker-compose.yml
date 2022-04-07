@@ -1,0 +1,40 @@
+version: '3.3'
+
+services:
+    postgres:
+        image: postgres:13
+        restart: unless-stopped
+        container_name: postgres
+        command: ["postgres", "-c", "log_statement=all", "-c", "log_destination=stderr"]
+        ports:
+          - "5432:5432"
+        environment:
+          POSTGRES_USER: "root"
+          POSTGRES_PASSWORD: "root"
+        volumes:
+          - ./.volumes/postgres:/var/lib/postgresql/data
+
+    mariadb:
+      image: mariadb:10.6.1
+      restart: unless-stopped
+      container_name: mariadb
+      ports:
+        - "3306:3306"
+      environment:
+        MYSQL_ROOT_PASSWORD: "root"
+      volumes:
+        - ./.volumes/mariadb:/var/lib/mysql
+    
+    mongo:
+      image: mongo:5.0.5
+      container_name: mongo
+      restart: unless-stopped
+      ports:
+        - "27017:27017"
+      environment:
+        MONGO_INITDB_ROOT_USERNAME: "root"
+        MONGO_INITDB_ROOT_PASSWORD: "root"
+        MONGO_INITDB_DATABASE: common
+      volumes:
+        - ./docker-entrypoint-initdb.d/mongo-init.js:/docker-entrypoint-initdb.d/mongo-init.js:ro
+        - ./.volumes/mongo:/data/db
